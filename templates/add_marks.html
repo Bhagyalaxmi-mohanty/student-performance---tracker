@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Marks</title>
+    <style>
+        body { font-family: Arial; text-align: center; margin-top: 50px; background-color: #f4f8fc; }
+        input, button { padding: 8px; margin: 5px; border-radius: 4px; border: 1px solid #ccc; }
+        button { background-color: #0059b3; color: white; border: none; }
+        button:hover { background-color: #003d80; }
+    </style>
+</head>
+<body>
+    <h2>Add Marks for {{ student.name }} (Roll: {{ student.roll }})</h2>
+    <form method="POST">
+        {% for sub in subjects %}
+            <label>{{ sub }}:</label>
+            <input type="number" step="any" name="{{ sub }}" placeholder="Enter marks"><br>
+        {% endfor %}
+        <button type="submit">Save Marks</button>
+    </form>
+    <a href="{{ url_for('index') }}">Back to Home</a>
+</body>
+</html>
+

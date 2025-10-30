@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Performance Tracker</title>
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
+            background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin-top: 40px;
+            color: #2c3e50;
+            font-size: 2.5em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h1::before {
+            content: "🎓";
+            font-size: 1.3em;
+        }
+
+        .container {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 90%;
+            max-width: 1000px;
+            transition: 0.3s;
+        }
+
+        .container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            font-size: 1em;
+        }
+
+        th {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        td {
+            color: #34495e;
+        }
+
+        .actions a {
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 500;
+            margin: 0 5px;
+            transition: 0.3s ease;
+        }
+
+        .actions a.add {
+            background: #4caf50;
+            color: white;
+        }
+
+        .actions a.add:hover {
+            background: #43a047;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+        }
+
+        .actions a.subject {
+            background: #e67e22;
+            color: white;
+        }
+
+        .actions a.subject:hover {
+            background: #d35400;
+            box-shadow: 0 0 10px rgba(230, 126, 34, 0.6);
+        }
+
+        .actions a.marks {
+            background: #3498db;
+            color: white;
+        }
+
+        .actions a.marks:hover {
+            background: #2980b9;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.6);
+        }
+
+        .no-data {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            padding: 15px;
+        }
+
+        .subject-box {
+            text-align: left;
+            padding-left: 20px;
+        }
+
+        .subject-box span {
+            display: inline-block;
+            margin: 3px 8px;
+            padding: 5px 10px;
+            background: #ecf0f1;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+
+        .grade {
+            font-weight: bold;
+        }
+
+        .grade.A { color: #2e7d32; }
+        .grade.B { color: #388e3c; }
+        .grade.C { color: #f57c00; }
+        .grade.D { color: #e53935; }
+        .grade.F { color: #b71c1c; }
+
+        .total-score {
+            font-weight: bold;
+            border-radius: 8px;
+            padding: 5px 10px;
+            display: inline-block;
+            color: white;
+        }
+
+        .total-high { background: #2ecc71; }    /* Green */
+        .total-mid { background: #f39c12; }     /* Orange */
+        .total-low { background: #e74c3c; }     /* Red */
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            padding: 20px;
+            color: #34495e;
+            font-size: 0.9em;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Student Performance Tracker</h1>
+
+    <div class="container">
+        <div class="actions">
+            <a href="{{ url_for('add_student') }}" class="add">➕ Add Student</a>
+            <a href="{{ url_for('add_subject') }}" class="subject">📘 Add Subject</a>
+        </div>
+
+        {% if students %}
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Roll No</th>
+                <th>Subjects & Marks (out of 100)</th>
+                <th>Total Marks</th>
+                <th>Average</th>
+                <th>Grade</th>
+                <th>Action</th>
+            </tr>
+            {% for s in students %}
+            {% set total = 0 %}
+            {% set max_total = (s['grades']|length) * 100 %}
+            {% for sub, mark in s['grades'].items() %}
+                {% set total = total + mark %}
+            {% endfor %}
+            {% if total >= 250 %}
+                {% set total_class = 'total-high' %}
+            {% elif total >= 150 %}
+                {% set total_class = 'total-mid' %}
+            {% else %}
+                {% set total_class = 'total-low' %}
+            {% endif %}
+            <tr>
+                <td>{{ s['name'] }}</td>
+                <td>{{ s['roll'] }}</td>
+                <td class="subject-box">
+                    {% if s['grades'] %}
+                        {% for sub, mark in s['grades'].items() %}
+                            <span><strong>{{ sub }}:</strong> {{ mark }} / 100</span>
+                        {% endfor %}
+                    {% else %}
+                        No marks yet
+                    {% endif %}
+                </td>
+                <td><span class="total-score {{ total_class }}">{{ "%.0f"|format(total) }} / {{ max_total }}</span></td>
+                <td>{{ "%.2f"|format(s['average']) }}</td>
+                <td class="grade {{ s['grade'] }}">{{ s['grade'] }}</td>
+                <td>
+                    <a href="{{ url_for('add_marks', roll=s['roll']) }}" class="marks">✏️ Add / Update Marks</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p class="no-data">No students added yet. Click “Add Student” to begin.</p>
+        {% endif %}
+    </div>
+
+    <footer>© 2025 Student Performance Tracker | Designed by bhagyalaxmi ✨</footer>
+
+</body>
+</html>
