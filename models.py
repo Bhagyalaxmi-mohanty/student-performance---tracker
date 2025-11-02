@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.types import JSON
+from sqlalchemy.dialects.sqlite import JSON
 
 db = SQLAlchemy()
 
@@ -9,5 +9,5 @@ class Student(db.Model):
     roll_number = db.Column(db.String(20), unique=True, nullable=False)
     grades = db.Column(JSON, default={})
 
-    def _repr_(self):
-        return f'<Student {self.name}>'
+    def __repr__(self):
+        return f"<Student {self.name}>"

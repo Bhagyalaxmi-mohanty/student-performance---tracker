@@ -116,11 +116,6 @@
             padding: 15px;
         }
 
-        .subject-box {
-            text-align: left;
-            padding-left: 20px;
-        }
-
         .subject-box span {
             display: inline-block;
             margin: 3px 8px;
@@ -148,9 +143,9 @@
             color: white;
         }
 
-        .total-high { background: #2ecc71; }    /* Green */
-        .total-mid { background: #f39c12; }     /* Orange */
-        .total-low { background: #e74c3c; }     /* Red */
+        .total-high { background: #2ecc71; } 
+        .total-mid { background: #f39c12; } 
+        .total-low { background: #e74c3c; }
 
         footer {
             margin-top: 40px;
@@ -164,65 +159,58 @@
 </head>
 <body>
 
-    <h1>Student Performance Tracker</h1>
+<h1>Student Performance Tracker</h1>
 
-    <div class="container">
-        <div class="actions">
-            <a href="{{ url_for('add_student') }}" class="add">➕ Add Student</a>
-            <a href="{{ url_for('add_subject') }}" class="subject">📘 Add Subject</a>
-        </div>
-
-        {% if students %}
-        <table>
-            <tr>
-                <th>Name</th>
-                <th>Roll No</th>
-                <th>Subjects & Marks (out of 100)</th>
-                <th>Total Marks</th>
-                <th>Average</th>
-                <th>Grade</th>
-                <th>Action</th>
-            </tr>
-            {% for s in students %}
-            {% set total = 0 %}
-            {% set max_total = (s['grades']|length) * 100 %}
-            {% for sub, mark in s['grades'].items() %}
-                {% set total = total + mark %}
-            {% endfor %}
-            {% if total >= 250 %}
-                {% set total_class = 'total-high' %}
-            {% elif total >= 150 %}
-                {% set total_class = 'total-mid' %}
-            {% else %}
-                {% set total_class = 'total-low' %}
-            {% endif %}
-            <tr>
-                <td>{{ s['name'] }}</td>
-                <td>{{ s['roll'] }}</td>
-                <td class="subject-box">
-                    {% if s['grades'] %}
-                        {% for sub, mark in s['grades'].items() %}
-                            <span><strong>{{ sub }}:</strong> {{ mark }} / 100</span>
-                        {% endfor %}
-                    {% else %}
-                        No marks yet
-                    {% endif %}
-                </td>
-                <td><span class="total-score {{ total_class }}">{{ "%.0f"|format(total) }} / {{ max_total }}</span></td>
-                <td>{{ "%.2f"|format(s['average']) }}</td>
-                <td class="grade {{ s['grade'] }}">{{ s['grade'] }}</td>
-                <td>
-                    <a href="{{ url_for('add_marks', roll=s['roll']) }}" class="marks">✏️ Add / Update Marks</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-        {% else %}
-        <p class="no-data">No students added yet. Click “Add Student” to begin.</p>
-        {% endif %}
+<div class="container">
+    <div class="actions">
+        <a href="{{ url_for('add_student') }}" class="add">➕ Add Student</a>
+        <a href="{{ url_for('add_subject') }}" class="subject">📘 Add Subject</a>
     </div>
 
-    <footer>© 2025 Student Performance Tracker | Designed by bhagyalaxmi ✨</footer>
+    {% if students %}
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Roll No</th>
+            <th>Subjects & Marks (out of 100)</th>
+            <th>Total Marks</th>
+            <th>Average</th>
+            <th>Grade</th>
+            <th>Action</th>
+        </tr>
+        {% for s in students %}
+        {% if s.total >= 250 %}
+            {% set total_class = 'total-high' %}
+        {% elif s.total >= 150 %}
+            {% set total_class = 'total-mid' %}
+        {% else %}
+            {% set total_class = 'total-low' %}
+        {% endif %}
+        <tr>
+            <td>{{ s.name }}</td>
+            <td>{{ s.roll }}</td>
+            <td class="subject-box">
+                {% if s.grades %}
+                    {% for sub, mark in s.grades.items() %}
+                        <span><strong>{{ sub }}:</strong> {{ mark }} / 100</span>
+                    {% endfor %}
+                {% else %}
+                    No marks yet
+                {% endif %}
+            </td>
+            <td><span class="total-score {{ total_class }}">{{ "%.0f"|format(s.total) }} / {{ s.max_total }}</span></td>
+            <td>{{ "%.2f"|format(s.average) }}</td>
+            <td class="grade {{ s.grade }}">{{ s.grade }}</td>
+            <td><a href="{{ url_for('add_marks', roll=s.roll) }}" class="marks">✏️ Add / Update Marks</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="no-data">No students added yet. Click “Add Student” to begin.</p>
+    {% endif %}
+</div>
+
+<footer>© 2025 Student Performance Tracker | Designed by bhagyalaxmi ✨</footer>
 
 </body>
 </html>
