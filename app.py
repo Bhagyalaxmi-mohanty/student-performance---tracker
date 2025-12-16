@@ -102,6 +102,31 @@ def add_marks(roll):
         return redirect(url_for('index'))
 
     return render_template("add_marks.html", student=student, subjects=subjects)
+@app.route('/edit_student/<roll>', methods=['GET', 'POST'])
+def edit_student(roll):
+    student = None
+
+    for s in students:
+        if s['roll'] == roll:
+            student = s
+            break
+
+    if not student:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        student['name'] = request.form['name'].strip()
+        student['roll'] = request.form['roll'].strip()
+        return redirect(url_for('index'))
+
+    return render_template("edit_student.html", student=student)
+@app.route('/delete_student/<roll>')
+def delete_student(roll):
+    global students
+    students = [s for s in students if s['roll'] != roll]
+    return redirect(url_for('index'))
+
+
 
 # -------------------------
 # Run Flask App
